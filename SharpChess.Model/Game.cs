@@ -87,52 +87,59 @@ namespace SharpChess.Model
             PlayerWhite.Brain.ReadyToMakeMoveEvent += PlayerReadyToMakeMove;
             PlayerBlack.Brain.ReadyToMakeMoveEvent += PlayerReadyToMakeMove;
 
-            RegistryKey registryKeySoftware = Registry.CurrentUser.OpenSubKey("Software", true);
-            if (registryKeySoftware != null)
+            try
             {
-                RegistryKey registryKeySharpChess = registryKeySoftware.CreateSubKey(@"PeterHughes.org\SharpChess");
-
-                if (registryKeySharpChess != null)
+                RegistryKey registryKeySoftware = Registry.CurrentUser.OpenSubKey("Software", true);
+                if (registryKeySoftware != null)
                 {
-                    if (registryKeySharpChess.GetValue("FileName") == null)
-                    {
-                        saveGameFileName = string.Empty;
-                    }
-                    else
-                    {
-                        saveGameFileName = registryKeySharpChess.GetValue("FileName").ToString();
-                    }
+                    RegistryKey registryKeySharpChess = registryKeySoftware.CreateSubKey(@"PeterHughes.org\SharpChess");
 
-                    if (registryKeySharpChess.GetValue("ShowThinking") == null)
+                    if (registryKeySharpChess != null)
                     {
-                        ShowThinking = true;
-                    }
-                    else
-                    {
-                        ShowThinking = registryKeySharpChess.GetValue("ShowThinking").ToString() == "1";
-                    }
+                        if (registryKeySharpChess.GetValue("FileName") == null)
+                        {
+                            saveGameFileName = string.Empty;
+                        }
+                        else
+                        {
+                            saveGameFileName = registryKeySharpChess.GetValue("FileName").ToString();
+                        }
 
-                    // Delete deprecated values
-                    if (registryKeySharpChess.GetValue("EnablePondering") != null)
-                    {
-                        registryKeySharpChess.DeleteValue("EnablePondering");
-                    }
+                        if (registryKeySharpChess.GetValue("ShowThinking") == null)
+                        {
+                            ShowThinking = true;
+                        }
+                        else
+                        {
+                            ShowThinking = registryKeySharpChess.GetValue("ShowThinking").ToString() == "1";
+                        }
 
-                    if (registryKeySharpChess.GetValue("DisplayMoveAnalysisTree") != null)
-                    {
-                        registryKeySharpChess.DeleteValue("DisplayMoveAnalysisTree");
-                    }
+                        // Delete deprecated values
+                        if (registryKeySharpChess.GetValue("EnablePondering") != null)
+                        {
+                            registryKeySharpChess.DeleteValue("EnablePondering");
+                        }
 
-                    if (registryKeySharpChess.GetValue("ClockMoves") != null)
-                    {
-                        registryKeySharpChess.DeleteValue("ClockMoves");
-                    }
+                        if (registryKeySharpChess.GetValue("DisplayMoveAnalysisTree") != null)
+                        {
+                            registryKeySharpChess.DeleteValue("DisplayMoveAnalysisTree");
+                        }
 
-                    if (registryKeySharpChess.GetValue("ClockMinutes") != null)
-                    {
-                        registryKeySharpChess.DeleteValue("ClockMinutes");
+                        if (registryKeySharpChess.GetValue("ClockMoves") != null)
+                        {
+                            registryKeySharpChess.DeleteValue("ClockMoves");
+                        }
+
+                        if (registryKeySharpChess.GetValue("ClockMinutes") != null)
+                        {
+                            registryKeySharpChess.DeleteValue("ClockMinutes");
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                
             }
 
             // OpeningBook.BookConvert(Game.PlayerWhite);
@@ -724,16 +731,22 @@ namespace SharpChess.Model
             PlayerWhite.Brain.AbortThinking();
             PlayerBlack.Brain.AbortThinking();
 
-            RegistryKey registryKeySoftware = Registry.CurrentUser.OpenSubKey("Software", true);
-            if (registryKeySoftware != null)
+            try
             {
-                RegistryKey registryKeySharpChess = registryKeySoftware.CreateSubKey(@"PeterHughes.org\SharpChess");
-
-                if (registryKeySharpChess != null)
+                RegistryKey registryKeySoftware = Registry.CurrentUser.OpenSubKey("Software", true);
+                if (registryKeySoftware != null)
                 {
-                    registryKeySharpChess.SetValue("FileName", saveGameFileName);
-                    registryKeySharpChess.SetValue("ShowThinking", ShowThinking ? "1" : "0");
+                    RegistryKey registryKeySharpChess = registryKeySoftware.CreateSubKey(@"PeterHughes.org\SharpChess");
+
+                    if (registryKeySharpChess != null)
+                    {
+                        registryKeySharpChess.SetValue("FileName", saveGameFileName);
+                        registryKeySharpChess.SetValue("ShowThinking", ShowThinking ? "1" : "0");
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
             }
         }
 
