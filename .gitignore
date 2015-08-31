@@ -21,6 +21,7 @@ ClientBin/
 ######################
 *.testsettings
 *.user
+*.userprefs
 *.suo
 *.ncb
 *.ccscc
@@ -70,3 +71,7 @@ TestResults/
 ######################
 *.vsp
 *.psess
+
+# Log files #
+#############
+UpgradeLog*.htm

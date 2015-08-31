@@ -424,9 +424,8 @@ namespace SharpChess.Model
         {
             // Types of promotion to generate. Removed bishop and Rook.
             Move.MoveNames[] promotionTypes = {
-                                                  Move.MoveNames.PawnPromotionQueen, Move.MoveNames.PawnPromotionKnight
-
-                                                  // Move.MoveNames.PawnPromotionBishop, Move.MoveNames.PawnPromotionRook // Why bother?
+                                                  Move.MoveNames.PawnPromotionQueen, Move.MoveNames.PawnPromotionKnight,
+                                                  Move.MoveNames.PawnPromotionBishop, Move.MoveNames.PawnPromotionRook
                                               };
 
             Square square;
