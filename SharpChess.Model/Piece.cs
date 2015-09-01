@@ -503,6 +503,11 @@ namespace SharpChess.Model
         public IPieceTop Top { get; set; }
 
         /// <summary>
+        ///   Gets or sets UserData that this piece is related.
+        /// </summary>
+        public object UserData { get; set; }
+
+        /// <summary>
         /// Gets the material value of this piece.
         /// </summary>
         public int Value
