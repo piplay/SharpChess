@@ -137,7 +137,7 @@ namespace SharpChess.Model
                     }
                 }
             }
-            catch (Exception ex)
+            catch
             {
                 
             }
@@ -745,7 +745,7 @@ namespace SharpChess.Model
                     }
                 }
             }
-            catch (Exception ex)
+            catch
             {
             }
         }
