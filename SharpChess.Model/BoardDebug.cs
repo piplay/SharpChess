@@ -28,8 +28,13 @@ namespace SharpChess.Model
     #region Using
 
     using System;
-    using System.Diagnostics;
     using System.Text;
+
+	#if UNITY
+	using UnityEngine;
+	#else
+    using System.Diagnostics;
+	#endif
 
     #endregion
 
@@ -93,7 +98,9 @@ namespace SharpChess.Model
         /// </example>
         public static void DebugDisplay()
         {
-			#if !UNITY_IPHONE
+			#if UNITY
+			Debug.Log(DebugGetBoard());
+			#else
             Debug.Write(DebugGetBoard());
             Debug.Write(". ");
 			#endif
