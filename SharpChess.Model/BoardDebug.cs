@@ -93,8 +93,10 @@ namespace SharpChess.Model
         /// </example>
         public static void DebugDisplay()
         {
+			#if !UNITY_IPHONE
             Debug.Write(DebugGetBoard());
             Debug.Write(". ");
+			#endif
         }
 
         #endregion
