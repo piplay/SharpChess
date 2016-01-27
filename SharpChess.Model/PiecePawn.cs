@@ -443,17 +443,18 @@ namespace SharpChess.Model
                 {
                     if (square.Piece != null && square.Piece.Player.Colour != this.Base.Player.Colour
                         && square.Piece.IsCapturable)
-                    {
-                        moves.Add(
-                            0, 
-                            0, 
-                            isPromotion ? promotionTypes[intIndex] : Move.MoveNames.Standard, 
-                            this.Base, 
-                            this.Base.Square, 
-                            square, 
-                            square.Piece, 
-                            0, 
-                            0);
+					{
+						moves.Add(
+							0, 
+							0, 
+							isPromotion ? promotionTypes[intIndex] : Move.MoveNames.Standard, 
+							this.Base, 
+							this.Base.Square, 
+							square, 
+							square.Piece, 
+							0, 
+							0);
+						 
                     }
                 }
 
@@ -463,16 +464,17 @@ namespace SharpChess.Model
                     if (square.Piece != null && square.Piece.Player.Colour != this.Base.Player.Colour
                         && square.Piece.IsCapturable)
                     {
-                        moves.Add(
-                            0, 
-                            0, 
-                            isPromotion ? promotionTypes[intIndex] : Move.MoveNames.Standard, 
-                            this.Base, 
-                            this.Base.Square, 
-                            square, 
-                            square.Piece, 
-                            0, 
-                            0);
+						moves.Add(
+							0, 
+							0, 
+							isPromotion ? promotionTypes[intIndex] : Move.MoveNames.Standard, 
+							this.Base, 
+							this.Base.Square, 
+							square, 
+							square.Piece, 
+							0, 
+							0);
+
                     }
                 }
 
@@ -482,16 +484,16 @@ namespace SharpChess.Model
                     if ((square = Board.GetSquare(this.Base.Square.Ordinal + this.Base.Player.PawnForwardOffset))
                         != null && square.Piece == null)
                     {
-                        moves.Add(
-                            0, 
-                            0, 
-                            isPromotion ? promotionTypes[intIndex] : Move.MoveNames.Standard, 
-                            this.Base, 
-                            this.Base.Square, 
-                            square, 
-                            square.Piece, 
-                            0, 
-                            0);
+						moves.Add(
+							0, 
+							0, 
+							isPromotion ? promotionTypes[intIndex] : Move.MoveNames.Standard, 
+							this.Base, 
+							this.Base.Square, 
+							square, 
+							square.Piece, 
+							0, 
+							0);
                     }
                 }
             }

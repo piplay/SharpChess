@@ -582,6 +582,7 @@ namespace SharpChess.Model
                 {
                     if (intRepetitionCount >= numberOfMoves)
                     {
+						UnityEngine.Debug.LogWarning ("++++++++VALID intRepetitionCount : " + intRepetitionCount.ToString () + "++++++"); 
                         return true;
                     }
 

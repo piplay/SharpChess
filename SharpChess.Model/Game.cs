@@ -46,6 +46,17 @@ namespace SharpChess.Model
     /// </summary>
     public static class Game
     {
+		public enum Status
+		{
+			Normal, 
+			Check,
+			Stalemate,
+			CheckMate,
+			ThreeMoveRepetitionDraw,
+			FiftyMoveDraw,
+			InsufficientMaterialDraw
+		}
+
         #region Constants and Fields
 
         /// <summary>
@@ -54,6 +65,17 @@ namespace SharpChess.Model
         private static string saveGameFileName = string.Empty;
 
         #endregion
+		#region Delegates
+
+		public delegate void GameStatusChanged (Status status);
+		public delegate void PlayerMoved (Move move);
+		public delegate void PlayerUndo ();
+
+		public static GameStatusChanged OnGameStatusChanged;
+		public static PlayerMoved OnPlayerMoved;
+		public static PlayerUndo OnPlayerUndo;
+
+		#endregion
 
         #region Constructors and Destructors
 
@@ -64,13 +86,14 @@ namespace SharpChess.Model
         {
             EnableFeatures();
             ClockIncrementPerMove = new TimeSpan(0, 0, 0);
-            ClockFixedTimePerMove = new TimeSpan(0, 0, 0);
-            DifficultyLevel = 1;
+            ClockFixedTimePerMove = new TimeSpan(0, 0, 2);
+            //DifficultyLevel = 12;
             ClockTime = new TimeSpan(0, 5, 0);
             ClockMaxMoves = 40;
             UseRandomOpeningMoves = true;
+			EnablePondering = false;
             MoveRedoList = new Moves();
-            MaximumSearchDepth = 1;
+            //MaximumSearchDepth = 32;
             MoveAnalysis = new Moves();
             MoveHistory = new Moves();
             FenStartPosition = string.Empty;
@@ -78,72 +101,27 @@ namespace SharpChess.Model
             HashTablePawn.Initialise();
             HashTableCheck.Initialise();
 
+
             PlayerWhite = new PlayerWhite();
+			//PlayerWhite.Intellegence = Player.PlayerIntellegenceNames.Computer;
+
+
             PlayerBlack = new PlayerBlack();
+			//PlayerBlack.Intellegence = Player.PlayerIntellegenceNames.Human;
+
             PlayerToPlay = PlayerWhite;
+
             Board.EstablishHashKey();
             OpeningBookSimple.Initialise();
 
             PlayerWhite.Brain.ReadyToMakeMoveEvent += PlayerReadyToMakeMove;
             PlayerBlack.Brain.ReadyToMakeMoveEvent += PlayerReadyToMakeMove;
 
-            try
-            {
-                RegistryKey registryKeySoftware = Registry.CurrentUser.OpenSubKey("Software", true);
-                if (registryKeySoftware != null)
-                {
-                    RegistryKey registryKeySharpChess = registryKeySoftware.CreateSubKey(@"PeterHughes.org\SharpChess");
-
-                    if (registryKeySharpChess != null)
-                    {
-                        if (registryKeySharpChess.GetValue("FileName") == null)
-                        {
-                            saveGameFileName = string.Empty;
-                        }
-                        else
-                        {
-                            saveGameFileName = registryKeySharpChess.GetValue("FileName").ToString();
-                        }
-
-                        if (registryKeySharpChess.GetValue("ShowThinking") == null)
-                        {
-                            ShowThinking = true;
-                        }
-                        else
-                        {
-                            ShowThinking = registryKeySharpChess.GetValue("ShowThinking").ToString() == "1";
-                        }
-
-                        // Delete deprecated values
-                        if (registryKeySharpChess.GetValue("EnablePondering") != null)
-                        {
-                            registryKeySharpChess.DeleteValue("EnablePondering");
-                        }
-
-                        if (registryKeySharpChess.GetValue("DisplayMoveAnalysisTree") != null)
-                        {
-                            registryKeySharpChess.DeleteValue("DisplayMoveAnalysisTree");
-                        }
-
-                        if (registryKeySharpChess.GetValue("ClockMoves") != null)
-                        {
-                            registryKeySharpChess.DeleteValue("ClockMoves");
-                        }
-
-                        if (registryKeySharpChess.GetValue("ClockMinutes") != null)
-                        {
-                            registryKeySharpChess.DeleteValue("ClockMinutes");
-                        }
-                    }
-                }
-            }
-            catch
-            {
-                
-            }
+			TryRegistryKey ();
 
             // OpeningBook.BookConvert(Game.PlayerWhite);
         }
+
 
         #endregion
 
@@ -546,7 +524,7 @@ namespace SharpChess.Model
             MakeAMoveInternal(moveName, piece, square);
             SaveBackup();
             SendBoardPositionChangeEvent();
-            CheckIfAutoNextMove();
+           // CheckIfAutoNextMove();
         }
 
         /// <summary>
@@ -791,9 +769,72 @@ namespace SharpChess.Model
             ResumePondering();
         }
 
+		public static void Retry () 
+		{
+			Game.New ();
+		}
+
         #endregion
 
         #region Methods
+
+		private static void TryRegistryKey () 
+		{
+			try
+			{
+				RegistryKey registryKeySoftware = Registry.CurrentUser.OpenSubKey("Software", true);
+				if (registryKeySoftware != null)
+				{
+					RegistryKey registryKeySharpChess = registryKeySoftware.CreateSubKey(@"PeterHughes.org\SharpChess");
+					
+					if (registryKeySharpChess != null)
+					{
+						if (registryKeySharpChess.GetValue("FileName") == null)
+						{
+							saveGameFileName = string.Empty;
+						}
+						else
+						{
+							saveGameFileName = registryKeySharpChess.GetValue("FileName").ToString();
+						}
+						
+						if (registryKeySharpChess.GetValue("ShowThinking") == null)
+						{
+							ShowThinking = true;
+						}
+						else
+						{
+							ShowThinking = registryKeySharpChess.GetValue("ShowThinking").ToString() == "1";
+						}
+						
+						// Delete deprecated values
+						if (registryKeySharpChess.GetValue("EnablePondering") != null)
+						{
+							registryKeySharpChess.DeleteValue("EnablePondering");
+						}
+						
+						if (registryKeySharpChess.GetValue("DisplayMoveAnalysisTree") != null)
+						{
+							registryKeySharpChess.DeleteValue("DisplayMoveAnalysisTree");
+						}
+						
+						if (registryKeySharpChess.GetValue("ClockMoves") != null)
+						{
+							registryKeySharpChess.DeleteValue("ClockMoves");
+						}
+						
+						if (registryKeySharpChess.GetValue("ClockMinutes") != null)
+						{
+							registryKeySharpChess.DeleteValue("ClockMinutes");
+						}
+					}
+				}
+			}
+			catch
+			{
+				
+			}
+		}
 
         /// <summary>
         ///   Add a move node to the save game XML document.
@@ -815,7 +856,7 @@ namespace SharpChess.Model
         /// <summary>
         ///   Start then next move automatically, if its the computers turn.
         /// </summary>
-        private static void CheckIfAutoNextMove()
+        public static void CheckIfAutoNextMove()
         {
             if (PlayerWhite.Intellegence == Player.PlayerIntellegenceNames.Computer
                 && PlayerBlack.Intellegence == Player.PlayerIntellegenceNames.Computer)
@@ -1012,34 +1053,62 @@ namespace SharpChess.Model
             if (PlayerToPlay.Intellegence == Player.PlayerIntellegenceNames.Computer)
             {
                 WinBoard.SendMove(move);
-                if (!PlayerToPlay.OpposingPlayer.CanMove)
-                {
-                    if (PlayerToPlay.OpposingPlayer.IsInCheckMate)
-                    {
-                        WinBoard.SendCheckMate();
-                    }
-                    else if (!PlayerToPlay.OpposingPlayer.IsInCheck)
-                    {
-                        WinBoard.SendCheckStaleMate();
-                    }
-                }
-                else if (PlayerToPlay.OpposingPlayer.CanClaimThreeMoveRepetitionDraw)
-                {
-                    WinBoard.SendDrawByRepetition();
-                }
-                else if (PlayerToPlay.OpposingPlayer.CanClaimFiftyMoveDraw)
-                {
-                    WinBoard.SendDrawByFiftyMoveRule();
-                }
-                else if (PlayerToPlay.OpposingPlayer.CanClaimInsufficientMaterialDraw)
-                {
-                    WinBoard.SendDrawByInsufficientMaterial();
-                }
+				if (!PlayerToPlay.OpposingPlayer.CanMove) {
+					if (PlayerToPlay.OpposingPlayer.IsInCheckMate) {
+						WinBoard.SendCheckMate ();
+					} else if (!PlayerToPlay.OpposingPlayer.IsInCheck) {
+						WinBoard.SendCheckStaleMate ();
+					}
+				} else if (PlayerToPlay.OpposingPlayer.CanClaimThreeMoveRepetitionDraw == true) {
+					WinBoard.SendDrawByRepetition ();
+				} else if (PlayerToPlay.OpposingPlayer.CanClaimFiftyMoveDraw == true) {
+					WinBoard.SendDrawByFiftyMoveRule ();
+				} else if (PlayerToPlay.OpposingPlayer.CanClaimInsufficientMaterialDraw == true) {
+					WinBoard.SendDrawByInsufficientMaterial ();
+				}
             }
 
+			BroadcastMovedName (move);
+			CheckGameStatus ();
             PlayerToPlay = PlayerToPlay.OpposingPlayer;
             PlayerToPlay.Clock.Start();
         }
+
+		private static void BroadcastMovedName (Move move) {
+			if (OnPlayerMoved != null) {
+				OnPlayerMoved (move);
+			}
+		}
+
+		private static void CheckGameStatus () {
+			if (!PlayerToPlay.OpposingPlayer.CanMove) {
+				if (PlayerToPlay.OpposingPlayer.IsInCheckMate) {
+					if (OnGameStatusChanged != null) {
+						OnGameStatusChanged (Status.CheckMate);
+					}
+				} else if (!PlayerToPlay.OpposingPlayer.IsInCheck) {
+					if (OnGameStatusChanged != null) {
+						OnGameStatusChanged (Status.Stalemate);
+					}
+				}
+			} else if (PlayerToPlay.OpposingPlayer.CanClaimThreeMoveRepetitionDraw == true) {
+				if (OnGameStatusChanged != null) {
+					OnGameStatusChanged (Status.ThreeMoveRepetitionDraw);
+				}
+			} else if (PlayerToPlay.OpposingPlayer.CanClaimFiftyMoveDraw == true) {
+				if (OnGameStatusChanged != null) {
+					OnGameStatusChanged (Status.FiftyMoveDraw);
+				};
+			} else if (PlayerToPlay.OpposingPlayer.CanClaimInsufficientMaterialDraw == true) {
+				if (OnGameStatusChanged != null) {
+					OnGameStatusChanged (Status.InsufficientMaterialDraw);
+				}
+			} else if (PlayerToPlay.OpposingPlayer.IsInCheck) {
+				if (OnGameStatusChanged != null) {
+					OnGameStatusChanged (Status.Check);
+				}
+			}
+		}
 
         /// <summary>
         ///   Instruct the computer to make its next move.
@@ -1214,6 +1283,11 @@ namespace SharpChess.Model
                 PlayerToPlay.Clock.Revert();
                 MoveRedoList.Add(moveUndo);
                 Move.Undo(moveUndo);
+
+				if (OnPlayerUndo != null) {
+					OnPlayerUndo ();
+				} 
+
                 PlayerToPlay = PlayerToPlay.OpposingPlayer;
                 if (MoveHistory.Count > 1)
                 {

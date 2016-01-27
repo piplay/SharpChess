@@ -433,6 +433,7 @@ namespace SharpChess.Model
                     for (int i = 0; i < moveVectors.Length; i++)
                     {
                         square = Board.GetSquare(this.Base.Square.Ordinal + moveVectors[i]);
+						
                         if (square != null && (square.Piece == null || (square.Piece.Player.Colour != this.Base.Player.Colour && square.Piece.IsCapturable)))
                         {
                             moves.Add(0, 0, Move.MoveNames.Standard, this.Base, this.Base.Square, square, square.Piece, 0, 0);
@@ -455,6 +456,7 @@ namespace SharpChess.Model
                     for (int i = 0; i < moveVectors.Length; i++)
                     {
                         square = Board.GetSquare(this.Base.Square.Ordinal + moveVectors[i]);
+						
                         if (square != null && (square.Piece != null && (square.Piece.Player.Colour != this.Base.Player.Colour && square.Piece.IsCapturable)))
                         {
                             moves.Add(0, 0, Move.MoveNames.Standard, this.Base, this.Base.Square, square, square.Piece, 0, 0);

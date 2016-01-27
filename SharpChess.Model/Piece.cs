@@ -707,7 +707,7 @@ namespace SharpChess.Model
         /// Generate "lazy" moves for this piece, which is all usual legal moves, but also includes moves that put the king in check.
         /// </summary>
         /// <param name="moves">
-        /// Moves list that will be populated with lazy moves.
+        /// .
         /// </param>
         /// <param name="movesType">
         /// Types of moves to include. e.g. All, or captures-only.
@@ -876,7 +876,7 @@ namespace SharpChess.Model
                         Board.PawnHashCodeA ^= squarepieceCaptured.Piece.HashCodeA;
                         Board.PawnHashCodeB ^= squarepieceCaptured.Piece.HashCodeB;
                     }
-
+					//TODO: aCapturinf Pice Here. -> SIL
                     squarepieceCaptured.Piece.Capture();
                 }
             }
@@ -925,23 +925,26 @@ namespace SharpChess.Model
                     this.Player.HasCastled = true;
                     break;
 
-                case Model.Move.MoveNames.PawnPromotionQueen:
-                    this.Promote(PieceNames.Queen);
-                    break;
-
-                case Model.Move.MoveNames.PawnPromotionRook:
+				case Model.Move.MoveNames.PawnPromotionQueen: {
+					this.Promote(PieceNames.Queen);
+					break;
+				}
+                    
+                case Model.Move.MoveNames.PawnPromotionRook: {
                     this.Promote(PieceNames.Rook);
                     break;
+				}
 
-                case Model.Move.MoveNames.PawnPromotionBishop:
+                case Model.Move.MoveNames.PawnPromotionBishop: {
                     this.Promote(PieceNames.Bishop);
                     break;
+				}
 
-                case Model.Move.MoveNames.PawnPromotionKnight:
+                case Model.Move.MoveNames.PawnPromotionKnight: {
                     this.Promote(PieceNames.Knight);
                     break;
-
-                case Model.Move.MoveNames.EnPassent:
+				}
+                case Model.Move.MoveNames.EnPassent: {
                     Board.HashCodeA ^= Board.GetPiece(this.Square.Ordinal - this.Player.PawnForwardOffset).HashCodeA;
                     Board.HashCodeB ^= Board.GetPiece(this.Square.Ordinal - this.Player.PawnForwardOffset).HashCodeB;
                     Board.PawnHashCodeA ^= Board.GetPiece(this.Square.Ordinal - this.Player.PawnForwardOffset).HashCodeA;
@@ -950,6 +953,7 @@ namespace SharpChess.Model
                         
                         // Take enemy pawn that is now behind us
                     break;
+			}
             }
 
             Board.HashCodeA ^= this.HashCodeA; // XOR piece into new piece position
@@ -1026,6 +1030,7 @@ namespace SharpChess.Model
             this.Player.DecreasePawnCount();
             this.Player.IncreaseMaterialCount();
             this.HasBeenPromoted = true;
+
         }
 
         /// <summary>

@@ -35,6 +35,7 @@ namespace SharpChess.Model.AI
     using System.Threading;
 
     using ThreadState = System.Threading.ThreadState;
+	using UnityEngine;
 
     #endregion
 
@@ -312,9 +313,9 @@ namespace SharpChess.Model.AI
 
             this.threadThought = new Thread(this.Think);
             this.threadThought.Name = (++Game.ThreadCounter).ToString();
-
+			//UnityEngine.Debug.Log (this.MyPlayer.Colour + " is thinking.");
             this.ThinkingBeginningEvent();
-            this.threadThought.Priority = ThreadPriority.Normal;
+            this.threadThought.Priority = System.Threading.ThreadPriority.Normal;
 
             this.threadThought.Start();
         }
@@ -337,7 +338,7 @@ namespace SharpChess.Model.AI
         public void Think()
         {
             // Determine the best move available for "this" player instance, from the current board position.
-            Debug.WriteLine(
+            System.Diagnostics.Debug.WriteLine(
                 string.Format(
                     "Thread {0} is " + (this.IsPondering ? "pondering" : "thinking"), Thread.CurrentThread.Name));
 
@@ -361,6 +362,7 @@ namespace SharpChess.Model.AI
                         if ((moveBook = OpeningBookSimple.SuggestRandomMove(player)) != null)
                         {
                             this.PrincipalVariation.Add(moveBook);
+							UnityEngine.Debug.Log ("MoveConsideredEvent Under Brain 1");
                             this.MoveConsideredEvent();
                             throw new ForceImmediateMoveException();
                         }
@@ -478,7 +480,7 @@ namespace SharpChess.Model.AI
             catch (ForceImmediateMoveException x)
             {
                 // Undo any moves made during thinking
-                Debug.WriteLine(x.ToString());
+                System.Diagnostics.Debug.WriteLine(x.ToString());
                 while (Game.TurnNo > intTurnNo)
                 {
                     Move.Undo(Game.MoveHistory.Last);
@@ -487,16 +489,18 @@ namespace SharpChess.Model.AI
 
             if (this.MoveConsideredEvent != null)
             {
+				UnityEngine.Debug.Log ("MoveConsideredEvent Under Brain 2");
                 this.MoveConsideredEvent();
             }
 
-            Debug.WriteLine(
+            System.Diagnostics.Debug.WriteLine(
                 string.Format(
                     "Thread {0} is ending " + (this.IsPondering ? "pondering" : "thinking"), Thread.CurrentThread.Name));
 
             this.threadThought = null;
             if (this.MoveConsideredEvent != null && !this.IsPondering)
             {
+				UnityEngine.Debug.Log ("ReadyToMakeMoveEvent Under Brain");
                 this.ReadyToMakeMoveEvent();
             }
 
